@@ -1,0 +1,103 @@
+一、#git 使用
+git init
+git commit -m "first commit"
+
+git remote add origin https://github.com/lrg000/jenkins-pipeline-demo.git
+
+git branch -M main
+git pull origin main --rebase
+git push -u origin main
+git add Jenkinsfile
+git commit -m "fix: update Jenkinsfile pipeline"
+git status
+
+git add main.py
+git commit -m "fix: update main.py"
+git add .
+git commit -m "test webhook"
+git push origin main
+
+二、#github创建仓库过程
+✔ 第1步：打开 GitHub
+
+👉 访问：
+
+https://github.com
+
+登录你的账号
+
+✔ 第2步：创建新仓库
+
+右上角点击：
+
+➕ → New repository
+✔ 第3步：填写信息
+
+照这样填👇
+
+📌 Repository name（仓库名）
+jenkins-pipeline-demo
+📌 选择公开/私有
+
+建议新手：
+
+✔ Public（公开）
+📌 勾选初始化
+
+一定勾：
+
+✔ Add a README file
+
+然后点击：
+
+Create repository
+
+
+三、#本地根目录下建一个Jenkinsfile文件
+pipeline {
+    agent any
+
+    stages {
+
+        stage('拉取代码') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('检查Python') {
+            steps {
+                bat 'python --version'
+            }
+        }
+
+        stage('运行Python脚本') {
+            steps {
+                bat 'python main.py'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "✅ Pipeline执行成功"
+        }
+        failure {
+            echo "❌ Pipeline执行失败"
+        }
+    }
+}
+
+四、#✔ 2. GitHub 设置 Webhook
+
+进入你的仓库：
+
+Settings → Webhooks → Add webhook
+
+填写：
+
+Payload URL:
+http://你的IP:8080/github-webhook/
+✔ 3. Content type
+application/json
+✔ 4. 保存
