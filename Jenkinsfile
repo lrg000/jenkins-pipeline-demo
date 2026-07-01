@@ -1,22 +1,37 @@
 pipeline {
     agent any
 
+    triggers {
+        githubPush()
+    }
+
     stages {
 
         stage('拉取代码') {
             steps {
-                git branch: 'main',
-                    url: 'https://github.com/lrg000/jenkins-pipeline-demo.git'
+                checkout scm
             }
         }
 
-        stage('检查环境') {
+        stage('环境检查') {
             steps {
                 bat 'python --version'
             }
         }
 
-        stage('运行 Python') {
+        stage('安装依赖') {
+            steps {
+                bat 'pip install -r requirements.txt'
+            }
+        }
+
+        stage('运行测试') {
+            steps {
+                bat 'pytest -v'
+            }
+        }
+
+        stage('运行主程序') {
             steps {
                 bat 'python main.py'
             }
@@ -25,10 +40,11 @@ pipeline {
 
     post {
         success {
-            echo '✅ Pipeline 执行成功'
+            echo "✅ 测试通过 + 构建成功"
         }
+
         failure {
-            echo '❌ Pipeline 执行失败'
+            echo "❌ 测试失败，Pipeline中断"
         }
     }
 }
